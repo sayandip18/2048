@@ -2,12 +2,19 @@ import React, { useState, useEffect } from "react";
 import cloneDeep from "lodash.clonedeep";
 
 function App() {
+  const UP_ARROW = 38;
+  const DOWN_ARROW = 40;
+  const LEFT_ARROW = 37;
+  const RIGHT_ARROW = 39;
+
   const [data, setData] = useState([
     [0, 0, 0, 0],
     [0, 0, 0, 0],
     [0, 0, 0, 0],
     [0, 0, 0, 0],
   ]);
+
+  const [gameOver, setGameOver] = useState(false);
 
   const initialize = () => {
 
@@ -220,6 +227,76 @@ function App() {
       return b;
     } else {
       setData(b);
+    }
+  };
+
+  const checkIfGameOver = () => {
+
+    let checker = swipeLeft(true);
+
+    if (JSON.stringify(data) !== JSON.stringify(checker)) {
+      return false;
+    }
+
+    let checker2 = swipeDown(true);
+    console.log("CHECKER DOWN");
+    console.table(data);
+    console.table(checker2);
+    if (JSON.stringify(data) !== JSON.stringify(checker2)) {
+      return false;
+    }
+
+    let checker3 = swipeRight(true);
+
+    if (JSON.stringify(data) !== JSON.stringify(checker3)) {
+      return false;
+    }
+
+    let checker4 = swipeUp(true);
+
+    if (JSON.stringify(data) !== JSON.stringify(checker4)) {
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleKeyDown = (event) => {
+    if (gameOver) {
+      return;
+    }
+    switch (event.keyCode) {
+      case UP_ARROW:
+        
+        swipeUp();
+        
+        break;
+
+      case DOWN_ARROW:
+        
+        swipeDown();
+        
+        break;
+
+      case LEFT_ARROW:
+        
+        swipeLeft();
+        
+        break;
+
+      case RIGHT_ARROW:
+        
+        swipeRight();
+        
+        break;
+
+      default:
+        break;
+    }
+
+    let gameOverr = checkIfGameOver();
+    if (gameOverr) {
+      setGameOver(true);
     }
   };
 
