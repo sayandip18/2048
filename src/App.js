@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import cloneDeep from "lodash.clonedeep";
+import { useEvent, getColors } from "./util";
+import Swipe from "react-easy-swipe";
 
 function App() {
   const UP_ARROW = 38;
@@ -261,6 +263,20 @@ function App() {
     return true;
   };
 
+  const resetGame = () => {
+    setGameOver(false);
+    const emptyGrid = [
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+    ];
+
+    addNumber(emptyGrid);
+    addNumber(emptyGrid);
+    setData(emptyGrid);
+  };
+
   const handleKeyDown = (event) => {
     if (gameOver) {
       return;
@@ -305,29 +321,110 @@ function App() {
     initialize();
   }, []);
 
+  useEvent("keydown", handleKeyDown);
+
 
   return (
-    <div style={{
-      background: "#AD9D8F",
-      width: "max-content",
-      height: "max-content",
-      margin: "auto",
-      padding: 5,
-      borderRadius: 5,
-      marginTop: 10,
-      position: "relative",
-    }}>
-      {data.map((row, oneIndex) => {
-        return(
-          <div style={{display: 'flex'}} key={oneIndex}>
-            {row.map((digit, index) => (
-              <Block num={digit} key={index}/>
-            ))}
+    <div className="App">
+      <div
+        style={{
+          width: 345,
+          margin: "auto",
+          marginTop: 30,
+        }}
+      >
+        <div style={{ display: "flex" }}>
+          <div
+            style={{
+              fontFamily: "sans-serif",
+              flex: 1,
+              fontWeight: "700",
+              fontSize: 60,
+              color: "#776e65",
+            }}
+          >
+            2048
           </div>
-        )
-      })
+          <div
+            style={{
+              flex: 1,
+              marginTop: "auto",
+            }}
+          >
+            <div onClick={resetGame} style={style.newGameButton}>
+              NEW GAME
+            </div>
+          </div>
+        </div>
+        <div
+          style={{
+            background: "#AD9D8F",
+            width: "max-content",
+            height: "max-content",
+            margin: "auto",
+            padding: 5,
+            borderRadius: 5,
+            marginTop: 10,
+            position: "relative",
+          }}
+        >
+          {gameOver && (
+            <div style={style.gameOverOverlay}>
+              <div>
+                <div
+                  style={{
+                    fontSize: 30,
+                    fontFamily: "sans-serif",
+                    fontWeight: "900",
+                    color: "#776E65",
+                  }}
+                >
+                  Game Over
+                </div>
+                <div>
+                  <div
+                    style={{
+                      flex: 1,
+                      marginTop: "auto",
+                    }}
+                  >
+                    <div onClick={resetGame} style={style.tryAgainButton}>
+                      Try Again
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          <Swipe
+            onSwipeDown={() => {
+              swipeDown();
+            }}
+            onSwipeLeft={() => swipeLeft()}
+            onSwipeRight={() => swipeRight()}
+            onSwipeUp={() => swipeUp()}
+            style={{ overflowY: "hidden" }}
+          >
+            {data.map((row, oneIndex) => {
+              return (
+                <div style={{ display: "flex" }} key={oneIndex}>
+                  {row.map((digit, index) => (
+                    <Block num={digit} key={index} />
+                  ))}
+                </div>
+              );
+            })}
+          </Swipe>
+        </div>
 
-      }
+        <div style={{ width: "inherit" }}>
+          <p class="game-explanation">
+            <strong class="important">How to play:</strong> Use your{" "}
+            <strong>arrow keys</strong> to move the tiles. When two tiles with
+            the same number touch, they <strong>merge into one!</strong>
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
@@ -339,7 +436,7 @@ const Block = ({ num }) => {
     <div
       style={{
         ...blockStyle,
-        // background: getColors(num),
+        background: getColors(num),
         color: num === 2 || num === 4 ? "#645B52" : "#F7F4EF",
       }}
     >
